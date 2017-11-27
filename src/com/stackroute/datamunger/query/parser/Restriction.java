@@ -5,15 +5,19 @@ package com.stackroute.datamunger.query.parser;
  * each conditions
  * */
 public class Restriction {
+
+	private String propertyName;
+	private String propertyValue;
+	private String condition;
 	
 	public String getPropertyName() {
-		return null;
+		return propertyName;
 	}
 	public String getPropertyValue() {
-		return null;
+		return propertyValue;
 	}
 	public String getCondition() {
-		return null;
+		return condition;
 	}
 
 }
