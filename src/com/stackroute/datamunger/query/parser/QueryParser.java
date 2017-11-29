@@ -117,6 +117,7 @@ public class QueryParser {
 		if (queryString.contains("where")) {
 			conditions = (queryString.split("where"))[1].split("(order)|(group)\\s+by");
 		}
+		queryParameter.set
 		
 	}
 

@@ -19,5 +19,16 @@ public class Restriction {
 	public String getCondition() {
 		return condition;
 	}
+	
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
+	}
+	public void setPropertyValue(String propertyValue) {
+		this.propertyValue = propertyValue;
+	}
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+
 
 }

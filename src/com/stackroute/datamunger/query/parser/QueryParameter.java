@@ -1,5 +1,6 @@
 package com.stackroute.datamunger.query.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 /* 
@@ -10,7 +11,7 @@ import java.util.Map;
 public class QueryParameter {
 	
 	private String fileName;
-	private List<Restriction> restriction;
+	private List<Restriction> restriction = new ArrayList<Restriction>();
 	private List<String> logicalOperators;
 	private List<String> fields;
 	private List<AggregateFunction> aggregateFunction;
@@ -27,6 +28,10 @@ public class QueryParameter {
 	
 	public List<Restriction> getRestrictions() {
 		return restriction;
+	}
+	
+	public void setRestrictions(String s1, String s2, String s3) {
+		((Restriction) restriction).setPropertyName(s1);
 	}
 	
 	public List<String> getLogicalOperators() {
