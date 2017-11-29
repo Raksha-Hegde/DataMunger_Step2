@@ -9,6 +9,7 @@ public class DataMunger {
 
 		
 		//read the query from the user
+		System.out.println("Enter a query: ");
 		Scanner sc = new Scanner(System.in);
 		String queryString = sc.nextLine();
 		sc.close();

@@ -9,7 +9,7 @@ import java.util.Map;
  * */
 public class QueryParameter {
 	
-	private String filenName;
+	private String fileName;
 	private List<Restriction> restriction;
 	private List<String> logicalOperators;
 	private List<String> fields;
@@ -18,7 +18,11 @@ public class QueryParameter {
 	private List<String> orderByFields;
 
 	public String getFile() {
-		return filenName;
+		return fileName;
+	}
+	
+	public void setFile(String fileName) {
+		this.fileName = fileName;
 	}
 	
 	public List<Restriction> getRestrictions() {
@@ -31,6 +35,10 @@ public class QueryParameter {
 	
 	public List<String> getFields() {
 		return fields;
+	}
+	
+	public void setFields(List<String> fields) {
+		this.fields = fields;
 	}
 	
 	public List<AggregateFunction> getAggregateFunctions() {
