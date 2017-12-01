@@ -212,7 +212,7 @@ public class QueryParser {
 					e.setFunction((fieldsString[i].split("\\("))[0].trim());
 					e.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
 					
-					// queryParameter.setAggregateFunctions(e);
+					 queryParameter.setAggregateFunctions(e);
 				}
 
 			}

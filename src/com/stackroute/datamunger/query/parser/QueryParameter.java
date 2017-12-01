@@ -13,7 +13,7 @@ public class QueryParameter {
 	private List<Restriction> restriction ;
 	private List<String> logicalOperators;
 	private List<String> fields;
-	private List<AggregateFunction> aggregateFunction;
+	private List<AggregateFunction> aggregateFunction = new ArrayList<AggregateFunction>();
 	private List<String> groupByFields;
 	private List<String> orderByFields;
 
@@ -52,12 +52,14 @@ public class QueryParameter {
 	}
 	
 	public List<AggregateFunction> getAggregateFunctions() {
+		
 		return aggregateFunction;
 	}
 	
 	public void setAggregateFunctions(AggregateFunction e) {
-		aggregateFunction = new ArrayList<AggregateFunction>();
+		
 		this.aggregateFunction.add(e);
+		
 	}
 	
 	public List<String> getGroupByFields() {
