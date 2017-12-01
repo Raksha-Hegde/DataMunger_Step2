@@ -1,6 +1,7 @@
 package com.stackroute.datamunger.query.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QueryParser {
@@ -14,9 +15,12 @@ public class QueryParser {
 	public QueryParameter parseQuery(String queryString) {
 
 		if (!queryString.isEmpty()) {
-			getFile(replaceCharacters(queryString));
-			getFields(replaceCharacters(queryString));
+			getFileName(replaceCharacters(queryString));
 			getConditions(replaceCharacters(queryString));
+			getLogicalOperators(replaceCharacters(queryString));
+			getFields(replaceCharacters(queryString));
+			getOrderByFields(replaceCharacters(queryString));
+			getGroupByFields(replaceCharacters(queryString));
 
 		} else {
 			System.out.println("Query String is empty!!s");
@@ -43,47 +47,62 @@ public class QueryParser {
 	}
 
 	/*
-	 * extract the name of the file from the query.
+	 * this method will split the query string based on space into an array of words
 	 */
+	public String[] getSplitStrings(String queryString) {
 
-	public void getFile(String queryString) {
-
-		/* File name can be found after the "from" clause */
-		String[] fileName = (queryString.split("from\\s+"))[1].split("where");
-		queryParameter.setFile(fileName[0]); // Call setFile method and pass the
-												// extracted fileName
+		queryString = queryString.toLowerCase();
+		String[] queryParts = queryString.split("\\s+");
+		return queryParts;
 	}
 
 	/*
-	 * extract the order by fields from the query string. Please note that we
-	 * will need to extract the field(s) after "order by" clause in the query,
-	 * if at all the order by clause exists. For eg: select
-	 * city,winner,team1,team2 from data/ipl.csv order by city from the query
-	 * mentioned above, we need to extract "city". Please note that we can have
-	 * more than one order by fields.
+	 * extract the name of the file from the query.
 	 */
 
-	/*
-	 * extract the group by fields from the query string. Please note that we
-	 * will need to extract the field(s) after "group by" clause in the query,
-	 * if at all the group by clause exists. For eg: select
-	 * city,max(win_by_runs) from data/ipl.csv group by city from the query
-	 * mentioned above, we need to extract "city". Please note that we can have
-	 * more than one group by fields.
-	 */
+	public void getFileName(String queryString) {
+		String[] fileName = (queryString.split("from\\s+"))[1].trim().split("(where)|(order)|(group)\\\\s+by");
+		queryParameter.setFile(fileName[0].trim());
+	}
 
 	/*
-	 * extract the selected fields from the query string. Please note that we
-	 * will need to extract the field(s) after "select" clause followed by a
-	 * space from the query string. For eg: select city,win_by_runs from
-	 * data/ipl.csv from the query mentioned above, we need to extract "city"
-	 * and "win_by_runs". Please note that we might have a field containing name
-	 * "from_date" or "from_hrs". Hence, consider this while parsing.
+	 * extract the order by fields from the query string.
 	 */
-	public void getFields(String queryString) {
+
+	public void getOrderByFields(String queryString) {
+
+		List<String> orderBy = new ArrayList<String>();
+		if (queryString.contains(" order by ")) {
+
+			String[] orderByFields = (queryString.trim().split("\\s+order\\s+by\\s+"))[1].trim().split(",");
+			for (int i = 0; i < orderByFields.length; i++)
+				orderBy.add(orderByFields[i]);
+		}
+		queryParameter.setOrderByFields(orderBy);
+	}
+
+	/*
+	 * extract the group by fields from the query string.
+	 */
+	public void getGroupByFields(String queryString) {
+
+		List<String> groupBy = new ArrayList<String>();
+		if (queryString.contains(" group by ")) {
+
+			String[] groupByFields = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim().split(",");
+			for (int i = 0; i < groupByFields.length; i++)
+				groupBy.add(groupByFields[i]);
+		}
+		queryParameter.setGroupByFields(groupBy);
+	}
+
+	/*
+	 * extract the selected fields from the query string.
+	 */
+	public String[] getFields(String queryString) {
 
 		String fields1[] = null;
-		List<String> fields = new ArrayList<>();
+		List<String> fields = new ArrayList<String>();
 
 		fields1 = (queryString.split("select\\s+"))[1].split("\\s+from");
 		fields1 = fields1[0].trim().split(",");
@@ -92,58 +111,110 @@ public class QueryParser {
 			fields.add(fields1[i].trim());
 		}
 		queryParameter.setFields(fields);
+		return fields1;
 
 	}
 
 	/*
-	 * extract the conditions from the query string(if exists). for each
-	 * condition, we need to capture the following: 1. Name of field 2.
-	 * condition 3. value
-	 * 
-	 * For eg: select city,winner,team1,team2,player_of_match from data/ipl.csv
-	 * where season >= 2008 or toss_decision != bat
-	 * 
-	 * here, for the first condition, "season>=2008" we need to capture: 1. Name
-	 * of field: season 2. condition: >= 3. value: 2008
-	 * 
-	 * the query might contain multiple conditions separated by OR/AND
-	 * operators. Please consider this while parsing the conditions.
-	 * 
+	 * This method is used to extract the conditions part from the query string.
+	 */
+	public String getConditionsPartQuery(String queryString) {
+
+		String conditionPart = null;
+		String[] temp = null;
+		if (queryString.contains("where")) {
+			temp = (queryString.toLowerCase().split("where"))[1].trim().split("(order)|(group)\\s+by");
+			conditionPart = temp[0].trim();
+		}
+		return conditionPart;
+
+	}
+
+	/*
+	 * extract the conditions from the query string(if exists)
 	 */
 
 	public void getConditions(String queryString) {
 
-		String[] conditions;
-		if (queryString.contains("where")) {
-			conditions = (queryString.split("where"))[1].split("(order)|(group)\\s+by");
+		String[] conditions = null;
+		if (getConditionsPartQuery(queryString) != null) {
+			String conditionPartQuery = getConditionsPartQuery(queryString).trim();
+			if (conditionPartQuery.toLowerCase().contains(" and ")
+					|| conditionPartQuery.toLowerCase().contains(" or ")) {
+				conditions = conditionPartQuery.trim().split("( and )|( or )");
+			} else {
+				conditions = new String[] { conditionPartQuery };
+			}
+			getConditionsSplitPart(conditions);
+
 		}
-		queryParameter.set
-		
+	}
+
+	/*
+	 * extract 1. Name of field 2. condition 3. value for each condition
+	 */
+
+	public void getConditionsSplitPart(String[] conditions) {
+
+		for (int i = 0; i < conditions.length; i++) {
+			String[] temp = getSplitStrings(conditions[i]);
+			Restriction r = new Restriction();
+			r.setPropertyName(temp[0].trim());
+			r.setCondition(temp[1].trim());
+			r.setPropertyValue(temp[2].trim());
+
+		}
+
 	}
 
 	/*
 	 * extract the logical operators(AND/OR) from the query, if at all it is
-	 * present. For eg: select city,winner,team1,team2,player_of_match from
-	 * data/ipl.csv where season >= 2008 or toss_decision != bat and city =
-	 * bangalore
-	 * 
-	 * the query mentioned above in the example should return a List of Strings
-	 * containing [or,and]
+	 * present.
 	 */
+	public void getLogicalOperators(String queryString) {
+
+		List<String> logicalOperator = null;
+		String conditionsPartQuery = getConditionsPartQuery(queryString);
+		if (conditionsPartQuery != null) {
+			if (conditionsPartQuery.contains(" and ") | conditionsPartQuery.contains(" or ")) {
+				logicalOperator = new ArrayList<String>();
+				String[] splitCondition = getSplitStrings(conditionsPartQuery.trim());
+				for (int i = 0; i < splitCondition.length; i++)
+					if (splitCondition[i].equals("and") | splitCondition[i].equals("or")) {
+						logicalOperator.add(splitCondition[i]);
+					}
+
+			}
+
+		}
+		queryParameter.setLogicalOperators(logicalOperator);
+
+	}
 
 	/*
-	 * extract the aggregate functions from the query. The presence of the
-	 * aggregate functions can determined if we have either "min" or "max" or
-	 * "sum" or "count" or "avg" followed by opening braces"(" after "select"
-	 * clause in the query string. in case it is present, then we will have to
-	 * extract the same. For each aggregate functions, we need to know the
-	 * following: 1. type of aggregate function(min/max/count/sum/avg) 2. field
-	 * on which the aggregate function is being applied
-	 * 
-	 * Please note that more than one aggregate function can be present in a
-	 * query
-	 * 
-	 * 
+	 * extract the aggregate functions from the query.
 	 */
+	public void getAggregateFunctions(String queryString) {
 
+		AggregateFunction e = new AggregateFunction();
+		String[] fieldsString = getFields(queryString.toLowerCase());
+		if ((fieldsString.length == 1) && (fieldsString[0].equals("*"))) {
+
+			// queryParameter.setAggregateFunctions(null);
+
+		} else {
+			for (int i = 0; i < fieldsString.length; i++) {
+
+				if (fieldsString[i].contains("(")) {
+					e.setFunction((fieldsString[i].split("("))[0].trim());
+					e.setField((fieldsString[i].split("("))[1].trim());
+					
+					 queryParameter.setAggregateFunctions(e);
+				}
+
+			}
+
+		}
+
+	}
 }

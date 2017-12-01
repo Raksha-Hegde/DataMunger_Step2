@@ -15,4 +15,12 @@ public class AggregateFunction {
 	public String getFunction() {
 		return function;
 	}
+	
+	public void setField(String field) {
+		this.field = field;
+	}
+	
+	public void setFunction(String function) {
+		this.function = function;
+	}
 }

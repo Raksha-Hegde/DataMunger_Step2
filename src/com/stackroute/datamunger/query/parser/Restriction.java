@@ -10,6 +10,13 @@ public class Restriction {
 	private String propertyValue;
 	private String condition;
 	
+	
+	public Restriction() {
+		this.setCondition(condition);
+		this.setPropertyName(propertyName);
+		this.setPropertyValue(propertyValue);
+	}
+	
 	public String getPropertyName() {
 		return propertyName;
 	}
