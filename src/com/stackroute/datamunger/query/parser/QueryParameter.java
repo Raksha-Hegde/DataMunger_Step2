@@ -2,7 +2,6 @@ package com.stackroute.datamunger.query.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 /* 
  * This class will contain the elements of the parsed Query String such as conditions,
  * logical operators,aggregate functions, file name, fields group by fields, order by
@@ -11,8 +10,8 @@ import java.util.Map;
 public class QueryParameter {
 	
 	private String fileName;
-	private List<Restriction> restriction = new ArrayList<Restriction>();
-	private List<String> logicalOperators = new ArrayList<String>();
+	private List<Restriction> restriction ;
+	private List<String> logicalOperators;
 	private List<String> fields;
 	private List<AggregateFunction> aggregateFunction;
 	private List<String> groupByFields;
@@ -31,7 +30,6 @@ public class QueryParameter {
 	}
 	
 	public void setRestrictions(Restriction r) {
-		
 		restriction.add(r);
 		
 	}
@@ -58,6 +56,7 @@ public class QueryParameter {
 	}
 	
 	public void setAggregateFunctions(AggregateFunction e) {
+		aggregateFunction = new ArrayList<AggregateFunction>();
 		this.aggregateFunction.add(e);
 	}
 	

@@ -21,6 +21,7 @@ public class QueryParser {
 			getFields(replaceCharacters(queryString));
 			getOrderByFields(replaceCharacters(queryString));
 			getGroupByFields(replaceCharacters(queryString));
+			getAggregateFunctions(replaceCharacters(queryString));
 
 		} else {
 			System.out.println("Query String is empty!!s");
@@ -162,6 +163,7 @@ public class QueryParser {
 			r.setPropertyName(temp[0].trim());
 			r.setCondition(temp[1].trim());
 			r.setPropertyValue(temp[2].trim());
+			queryParameter.setRestrictions(r);
 
 		}
 
@@ -199,17 +201,18 @@ public class QueryParser {
 		AggregateFunction e = new AggregateFunction();
 		String[] fieldsString = getFields(queryString.toLowerCase());
 		if ((fieldsString.length == 1) && (fieldsString[0].equals("*"))) {
-
-			// queryParameter.setAggregateFunctions(null);
+			e.setFunction(null);
+			e.setField(null);
+			 queryParameter.setAggregateFunctions(null);
 
 		} else {
 			for (int i = 0; i < fieldsString.length; i++) {
 
 				if (fieldsString[i].contains("(")) {
-					e.setFunction((fieldsString[i].split("("))[0].trim());
-					e.setField((fieldsString[i].split("("))[1].trim());
+					e.setFunction((fieldsString[i].split("\\("))[0].trim());
+					e.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
 					
-					 queryParameter.setAggregateFunctions(e);
+					// queryParameter.setAggregateFunctions(e);
 				}
 
 			}
