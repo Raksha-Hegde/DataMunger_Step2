@@ -16,8 +16,11 @@ public class QueryParser {
 
 		if (!queryString.isEmpty()) {
 			getFileName(replaceCharacters(queryString));
-			getConditions(replaceCharacters(queryString));
-			getLogicalOperators(replaceCharacters(queryString));
+			if (queryString.contains("where")) {
+				getConditions(replaceCharacters(queryString));
+				getLogicalOperators(replaceCharacters(queryString));
+			}
+
 			getFields(replaceCharacters(queryString));
 			getOrderByFields(replaceCharacters(queryString));
 			getGroupByFields(replaceCharacters(queryString));
@@ -91,9 +94,15 @@ public class QueryParser {
 	public void getGroupByFields(String queryString) {
 
 		List<String> groupBy = new ArrayList<String>();
-		if (queryString.contains(" group by ")) {
 
-			String[] groupByFields = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim().split(",");
+		// Check if Group by clause is present
+		if (queryString.contains(" group by ")) {
+			String groupByPart = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim();
+			// Check if Order by clause is present
+			if (groupByPart.contains(" order by ")) {
+				groupByPart = (groupByPart.split("\\s+order\\s+by\\s+"))[0].trim();
+			}
+			String[] groupByFields = groupByPart.trim().split(",");
 			for (int i = 0; i < groupByFields.length; i++)
 				groupBy.add(groupByFields[i]);
 		}
@@ -127,7 +136,7 @@ public class QueryParser {
 		String conditionPart = null;
 		String[] temp = null;
 		if (queryString.contains("where")) {
-			temp = (queryString.toLowerCase().split("where"))[1].trim().split("(order)|(group)\\s+by");
+			temp = (queryString.split("where"))[1].trim().split("(order)|(group)\\s+by");
 			conditionPart = temp[0].trim();
 		}
 		return conditionPart;
@@ -151,7 +160,7 @@ public class QueryParser {
 			}
 
 			for (int i = 0; i < conditions.length; i++) {
-				String[] temp = getSplitStrings(conditions[i]);
+				String[] temp = conditions[i].split("\\s+");
 				Restriction r = new Restriction();
 				r.setPropertyName(temp[0].trim());
 				r.setPropertyValue(temp[2].trim());
@@ -159,8 +168,13 @@ public class QueryParser {
 				queryParameter.setRestrictions(r);
 
 			}
-			
 
+		} else {
+			Restriction r = new Restriction();
+			r.setPropertyName(null);
+			r.setPropertyValue(null);
+			r.setCondition(null);
+			queryParameter.setRestrictions(null);
 		}
 	}
 
