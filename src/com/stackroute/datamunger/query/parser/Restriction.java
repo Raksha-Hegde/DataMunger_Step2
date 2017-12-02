@@ -9,33 +9,29 @@ public class Restriction {
 	private String propertyName;
 	private String propertyValue;
 	private String condition;
-	
-	
-	public Restriction() {
-		this.setCondition(condition);
-		this.setPropertyName(propertyName);
-		this.setPropertyValue(propertyValue);
-	}
-	
+
 	public String getPropertyName() {
 		return propertyName;
 	}
+
 	public String getPropertyValue() {
 		return propertyValue;
 	}
+
 	public String getCondition() {
 		return condition;
 	}
-	
+
 	public void setPropertyName(String propertyName) {
 		this.propertyName = propertyName;
 	}
+
 	public void setPropertyValue(String propertyValue) {
 		this.propertyValue = propertyValue;
 	}
+
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
-
 
 }

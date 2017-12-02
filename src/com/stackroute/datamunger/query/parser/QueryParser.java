@@ -152,7 +152,6 @@ public class QueryParser {
 
 			for (int i = 0; i < conditions.length; i++) {
 				String[] temp = getSplitStrings(conditions[i]);
-				System.out.println(conditions[i]);
 				Restriction r = new Restriction();
 				r.setPropertyName(temp[0].trim());
 				r.setPropertyValue(temp[2].trim());
@@ -160,6 +159,7 @@ public class QueryParser {
 				queryParameter.setRestrictions(r);
 
 			}
+			
 
 		}
 	}

@@ -31,7 +31,7 @@ public class QueryParameter {
 	}
 
 	public void setRestrictions(Restriction r) {
-		restriction.add(r);
+		this.restriction.add(r);
 
 	}
 
