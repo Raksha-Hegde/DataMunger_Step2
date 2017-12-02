@@ -16,11 +16,11 @@ public class QueryParser {
 
 		if (!queryString.isEmpty()) {
 			getFileName(replaceCharacters(queryString));
+			getBaseQuery(replaceCharacters(queryString));
 			if (queryString.contains("where")) {
 				getConditions(replaceCharacters(queryString));
 				getLogicalOperators(replaceCharacters(queryString));
 			}
-
 			getFields(replaceCharacters(queryString));
 			getOrderByFields(replaceCharacters(queryString));
 			getGroupByFields(replaceCharacters(queryString));
@@ -53,12 +53,25 @@ public class QueryParser {
 	}
 
 	/*
+	 * This method is used to extract the baseQuery from the query string.
+	 * BaseQuery contains from the beginning of the query till the where clause
+	 */
+	public String getBaseQuery(String queryString) {
+
+		String[] temp = null;
+		temp = queryString.split("where|order\\s+by|group\\s+by");
+		String baseQueryString = temp[0];
+
+		return baseQueryString;
+
+	}
+
+	/*
 	 * this method will split the query string based on space into an array of
 	 * words
 	 */
 	public String[] getSplitStrings(String queryString) {
 
-		queryString = queryString.toLowerCase();
 		String[] queryParts = queryString.split("\\s+");
 		return queryParts;
 	}
@@ -69,6 +82,8 @@ public class QueryParser {
 
 	public void getFileName(String queryString) {
 		String[] fileName = (queryString.split("from\\s+"))[1].trim().split("(where)|(order)|(group)\\\\s+by");
+
+		/* Set the file name to QueryParamter variable */
 		queryParameter.setFile(fileName[0].trim());
 	}
 
@@ -85,6 +100,8 @@ public class QueryParser {
 			for (int i = 0; i < orderByFields.length; i++)
 				orderBy.add(orderByFields[i]);
 		}
+
+		/* Set the orderBy fields to QueryParamter variable */
 		queryParameter.setOrderByFields(orderBy);
 	}
 
@@ -98,6 +115,7 @@ public class QueryParser {
 		// Check if Group by clause is present
 		if (queryString.contains(" group by ")) {
 			String groupByPart = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim();
+
 			// Check if Order by clause is present
 			if (groupByPart.contains(" order by ")) {
 				groupByPart = (groupByPart.split("\\s+order\\s+by\\s+"))[0].trim();
@@ -106,6 +124,8 @@ public class QueryParser {
 			for (int i = 0; i < groupByFields.length; i++)
 				groupBy.add(groupByFields[i]);
 		}
+
+		/* Set the groupBy to QueryParamter variable */
 		queryParameter.setGroupByFields(groupBy);
 	}
 
@@ -117,7 +137,7 @@ public class QueryParser {
 		String fields1[] = null;
 		List<String> fields = new ArrayList<String>();
 
-		fields1 = (queryString.split("select\\s+"))[1].split("\\s+from");
+		fields1 = (getBaseQuery(queryString).split("select\\s+"))[1].split("\\s+from");
 		fields1 = fields1[0].trim().split(",");
 
 		for (int i = 0; i < fields1.length; i++) {
