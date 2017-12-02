@@ -21,7 +21,9 @@ public class QueryParser {
 			getFields(replaceCharacters(queryString));
 			getOrderByFields(replaceCharacters(queryString));
 			getGroupByFields(replaceCharacters(queryString));
-			getAggregateFunctions(replaceCharacters(queryString));
+			if (queryString.contains("(")) {
+				getAggregateFunctions(replaceCharacters(queryString));
+			}
 
 		} else {
 			System.out.println("Query String is empty!!s");
@@ -48,7 +50,8 @@ public class QueryParser {
 	}
 
 	/*
-	 * this method will split the query string based on space into an array of words
+	 * this method will split the query string based on space into an array of
+	 * words
 	 */
 	public String[] getSplitStrings(String queryString) {
 
@@ -146,27 +149,19 @@ public class QueryParser {
 			} else {
 				conditions = new String[] { conditionPartQuery };
 			}
-			getConditionsSplitPart(conditions);
+
+			for (int i = 0; i < conditions.length; i++) {
+				String[] temp = getSplitStrings(conditions[i]);
+				System.out.println(conditions[i]);
+				Restriction r = new Restriction();
+				r.setPropertyName(temp[0].trim());
+				r.setPropertyValue(temp[2].trim());
+				r.setCondition(temp[1].trim());
+				queryParameter.setRestrictions(r);
+
+			}
 
 		}
-	}
-
-	/*
-	 * extract 1. Name of field 2. condition 3. value for each condition
-	 */
-
-	public void getConditionsSplitPart(String[] conditions) {
-
-		for (int i = 0; i < conditions.length; i++) {
-			String[] temp = getSplitStrings(conditions[i]);
-			Restriction r = new Restriction();
-			r.setPropertyName(temp[0].trim());
-			r.setCondition(temp[1].trim());
-			r.setPropertyValue(temp[2].trim());
-			queryParameter.setRestrictions(r);
-
-		}
-
 	}
 
 	/*
@@ -203,7 +198,7 @@ public class QueryParser {
 		if ((fieldsString.length == 1) && (fieldsString[0].equals("*"))) {
 			e.setFunction(null);
 			e.setField(null);
-			 queryParameter.setAggregateFunctions(null);
+			queryParameter.setAggregateFunctions(null);
 
 		} else {
 			for (int i = 0; i < fieldsString.length; i++) {
@@ -211,8 +206,8 @@ public class QueryParser {
 				if (fieldsString[i].contains("(")) {
 					e.setFunction((fieldsString[i].split("\\("))[0].trim());
 					e.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
-					
-					 queryParameter.setAggregateFunctions(e);
+
+					queryParameter.setAggregateFunctions(e);
 				}
 
 			}
