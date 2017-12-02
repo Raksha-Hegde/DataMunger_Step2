@@ -11,7 +11,7 @@ import java.util.List;
 public class QueryParameter {
 
 	private String fileName;
-	private List<Restriction> restriction = new ArrayList<Restriction>();
+	List<Restriction> restriction;
 	private List<String> logicalOperators;
 	private List<String> fields;
 	private List<AggregateFunction> aggregateFunction = new ArrayList<AggregateFunction>();

@@ -15,15 +15,22 @@ public class QueryParser {
 	public QueryParameter parseQuery(String queryString) {
 
 		if (!queryString.isEmpty()) {
+
 			getFileName(replaceCharacters(queryString));
 			getBaseQuery(replaceCharacters(queryString));
 			if (queryString.contains("where")) {
+				queryParameter.restriction = new ArrayList<Restriction>(); 
 				getConditions(replaceCharacters(queryString));
 				getLogicalOperators(replaceCharacters(queryString));
 			}
+
 			getFields(replaceCharacters(queryString));
-			getOrderByFields(replaceCharacters(queryString));
-			getGroupByFields(replaceCharacters(queryString));
+			if (queryString.contains(" order by")) {
+				getOrderByFields(replaceCharacters(queryString));
+			}
+			if (queryString.contains(" group by")) {
+				getGroupByFields(replaceCharacters(queryString));
+			}
 			if (queryString.contains("(")) {
 				getAggregateFunctions(replaceCharacters(queryString));
 			}
@@ -170,6 +177,7 @@ public class QueryParser {
 	public void getConditions(String queryString) {
 
 		String[] conditions = null;
+
 		if (getConditionsPartQuery(queryString) != null) {
 			String conditionPartQuery = getConditionsPartQuery(queryString).trim();
 			if (conditionPartQuery.toLowerCase().contains(" and ")
@@ -188,14 +196,9 @@ public class QueryParser {
 				queryParameter.setRestrictions(r);
 
 			}
-
-		} else {
-			Restriction r = new Restriction();
-			r.setPropertyName(null);
-			r.setPropertyValue(null);
-			r.setCondition(null);
-			queryParameter.setRestrictions(null);
 		}
+
+		
 	}
 
 	/*
