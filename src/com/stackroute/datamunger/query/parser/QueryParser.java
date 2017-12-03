@@ -16,23 +16,22 @@ public class QueryParser {
 
 		if (!queryString.isEmpty()) {
 
-			getFileName(replaceCharacters(queryString));
+			queryParameter.setFile(getFileName(replaceCharacters(queryString)));
 			getBaseQuery(replaceCharacters(queryString));
 			if (queryString.contains("where")) {
-				queryParameter.restriction = new ArrayList<Restriction>(); 
-				getConditions(replaceCharacters(queryString));
-				getLogicalOperators(replaceCharacters(queryString));
+				queryParameter.setRestrictions(getConditions(replaceCharacters(queryString)));
+				queryParameter.setLogicalOperators(getLogicalOperators(replaceCharacters(queryString)));
 			}
 
 			getFields(replaceCharacters(queryString));
 			if (queryString.contains(" order by")) {
-				getOrderByFields(replaceCharacters(queryString));
+				queryParameter.setOrderByFields(getOrderByFields(replaceCharacters(queryString)));
 			}
 			if (queryString.contains(" group by")) {
-				getGroupByFields(replaceCharacters(queryString));
+				queryParameter.setGroupByFields(getGroupByFields(replaceCharacters(queryString)));
 			}
 			if (queryString.contains("(")) {
-				getAggregateFunctions(replaceCharacters(queryString));
+				queryParameter.setAggregateFunctions(getAggregateFunctions(replaceCharacters(queryString)));
 			}
 
 		} else {
@@ -87,40 +86,50 @@ public class QueryParser {
 	 * extract the name of the file from the query.
 	 */
 
-	public void getFileName(String queryString) {
-		String[] fileName = (queryString.split("from\\s+"))[1].trim().split("(where)|(order)|(group)\\\\s+by");
+	public String getFileName(String queryString) {
 
-		/* Set the file name to QueryParamter variable */
-		queryParameter.setFile(fileName[0].trim());
+		String fileName;
+		try {
+			String[] fileNameField = (queryString.split("from"))[1].split("(where)|(order)|(group)\\\\s+by");
+
+			if (fileNameField[0].trim().isEmpty()) {
+				fileName = null;
+			} else {
+
+				fileName = fileNameField[0].trim();
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			fileName = null;
+		}
+		return fileName;
 	}
 
 	/*
 	 * extract the order by fields from the query string.
 	 */
 
-	public void getOrderByFields(String queryString) {
+	public List<String> getOrderByFields(String queryString) {
 
-		List<String> orderBy = new ArrayList<String>();
+		List<String> orderBy = null;
 		if (queryString.contains(" order by ")) {
-
+			orderBy = new ArrayList<String>();
 			String[] orderByFields = (queryString.trim().split("\\s+order\\s+by\\s+"))[1].trim().split(",");
 			for (int i = 0; i < orderByFields.length; i++)
 				orderBy.add(orderByFields[i]);
 		}
-
-		/* Set the orderBy fields to QueryParamter variable */
-		queryParameter.setOrderByFields(orderBy);
+		return orderBy;
 	}
 
 	/*
 	 * extract the group by fields from the query string.
 	 */
-	public void getGroupByFields(String queryString) {
+	public List<String> getGroupByFields(String queryString) {
 
-		List<String> groupBy = new ArrayList<String>();
+		List<String> groupBy = null;
 
 		// Check if Group by clause is present
 		if (queryString.contains(" group by ")) {
+			groupBy = new ArrayList<String>();
 			String groupByPart = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim();
 
 			// Check if Order by clause is present
@@ -134,6 +143,7 @@ public class QueryParser {
 
 		/* Set the groupBy to QueryParamter variable */
 		queryParameter.setGroupByFields(groupBy);
+		return groupBy;
 	}
 
 	/*
@@ -174,10 +184,10 @@ public class QueryParser {
 	 * extract the conditions from the query string(if exists)
 	 */
 
-	public void getConditions(String queryString) {
+	public List<Restriction> getConditions(String queryString) {
 
 		String[] conditions = null;
-
+		List<Restriction> restrictList = queryParameter.getRestrictions();
 		if (getConditionsPartQuery(queryString) != null) {
 			String conditionPartQuery = getConditionsPartQuery(queryString).trim();
 			if (conditionPartQuery.toLowerCase().contains(" and ")
@@ -186,26 +196,25 @@ public class QueryParser {
 			} else {
 				conditions = new String[] { conditionPartQuery };
 			}
-
+			restrictList = new ArrayList<Restriction>();
 			for (int i = 0; i < conditions.length; i++) {
 				String[] temp = conditions[i].split("\\s+");
 				Restriction restriction = new Restriction();
 				restriction.setPropertyName(temp[0].trim());
 				restriction.setPropertyValue(temp[2].trim());
 				restriction.setCondition(temp[1].trim());
-				queryParameter.setRestrictions(restriction);
+				restrictList.add(restriction);
 
 			}
 		}
-
-		
+		return restrictList;
 	}
 
 	/*
 	 * extract the logical operators(AND/OR) from the query, if at all it is
 	 * present.
 	 */
-	public void getLogicalOperators(String queryString) {
+	public List<String> getLogicalOperators(String queryString) {
 
 		List<String> logicalOperator = null;
 		String conditionsPartQuery = getConditionsPartQuery(queryString);
@@ -221,35 +230,30 @@ public class QueryParser {
 			}
 
 		}
-		queryParameter.setLogicalOperators(logicalOperator);
+		return logicalOperator;
 
 	}
 
 	/*
 	 * extract the aggregate functions from the query.
 	 */
-	public void getAggregateFunctions(String queryString) {
+	public List<AggregateFunction> getAggregateFunctions(String queryString) {
 
+		List<AggregateFunction> aggregateList = queryParameter.getAggregateFunctions();
 		AggregateFunction aggregate = new AggregateFunction();
 		String[] fieldsString = getFields(queryString.toLowerCase());
-		if ((fieldsString.length == 1) && (fieldsString[0].equals("*"))) {
-			aggregate.setFunction(null);
-			aggregate.setField(null);
-			queryParameter.setAggregateFunctions(null);
-
-		} else {
+		if ((fieldsString.length != 1) && (!(fieldsString[0].equals("*")))) {
+			aggregateList = new ArrayList<AggregateFunction>();
 			for (int i = 0; i < fieldsString.length; i++) {
-
 				if (fieldsString[i].contains("(")) {
 					aggregate.setFunction((fieldsString[i].split("\\("))[0].trim());
 					aggregate.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
-
-					queryParameter.setAggregateFunctions(aggregate);
+					aggregateList.add(aggregate);
 				}
 
 			}
 
 		}
-
+		return aggregateList;
 	}
 }

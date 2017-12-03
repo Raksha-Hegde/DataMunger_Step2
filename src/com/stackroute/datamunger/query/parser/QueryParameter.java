@@ -14,7 +14,7 @@ public class QueryParameter {
 	List<Restriction> restriction;
 	private List<String> logicalOperators;
 	private List<String> fields;
-	private List<AggregateFunction> aggregateFunction = new ArrayList<AggregateFunction>();
+	private List<AggregateFunction> aggregateFunction;
 	private List<String> groupByFields;
 	private List<String> orderByFields;
 
@@ -30,8 +30,8 @@ public class QueryParameter {
 		return restriction;
 	}
 
-	public void setRestrictions(Restriction restrictionObj) {
-		this.restriction.add(restrictionObj);
+	public void setRestrictions(List<Restriction> restrictionsList) {
+		this.restriction = restrictionsList;
 
 	}
 
@@ -57,9 +57,9 @@ public class QueryParameter {
 		return aggregateFunction;
 	}
 
-	public void setAggregateFunctions(AggregateFunction aggregate) {
+	public void setAggregateFunctions(List<AggregateFunction> aggregateFunctionList) {
 
-		this.aggregateFunction.add(aggregate);
+		this.aggregateFunction = aggregateFunctionList;
 
 	}
 
