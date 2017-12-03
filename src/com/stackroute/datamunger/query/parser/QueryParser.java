@@ -6,7 +6,7 @@ import java.util.List;
 
 public class QueryParser {
 
-	private QueryParameter queryParameter = new QueryParameter();
+	private final QueryParameter queryParameter = new QueryParameter();
 
 	/*
 	 * this method will parse the queryString and will return the object of
@@ -78,8 +78,8 @@ public class QueryParser {
 	 */
 	public String[] getSplitStrings(String queryString) {
 
-		String[] queryParts = queryString.split("\\s+");
-		return queryParts;
+		
+		return queryString.split("\\s+");
 	}
 
 	/*
@@ -90,7 +90,7 @@ public class QueryParser {
 
 		String fileName = null;
 		try {
-			String[] fileNameField = (queryString.split("from"))[1].split("(where)|(order)|(group)\\\\s+by");
+			String[] fileNameField = queryString.split("from")[1].split("(where)|(order)|(group)\\\\s+by");
 			if (!fileNameField[0].trim().isEmpty()) {
 				fileName = fileNameField[0].trim();
 			}
@@ -109,7 +109,7 @@ public class QueryParser {
 		List<String> orderBy = null;
 		if (queryString.contains(" order by ")) {
 			orderBy = new ArrayList<String>();
-			String[] orderByFields = (queryString.trim().split("\\s+order\\s+by\\s+"))[1].trim().split(",");
+			String[] orderByFields = queryString.trim().split("\\s+order\\s+by\\s+")[1].trim().split(",");
 			for (int i = 0; i < orderByFields.length; i++) {
 				orderBy.add(orderByFields[i]);
 			}
@@ -127,11 +127,11 @@ public class QueryParser {
 		// Check if Group by clause is present
 		if (queryString.contains(" group by ")) {
 			groupBy = new ArrayList<String>();
-			String groupByPart = (queryString.trim().split("\\s+group\\s+by\\s+"))[1].trim();
+			String groupByPart = queryString.trim().split("\\s+group\\s+by\\s+")[1].trim();
 
 			// Check if Order by clause is present
 			if (groupByPart.contains(" order by ")) {
-				groupByPart = (groupByPart.split("\\s+order\\s+by\\s+"))[0].trim();
+				groupByPart = groupByPart.split("\\s+order\\s+by\\s+")[0].trim();
 			}
 			String[] groupByFields = groupByPart.trim().split(",");
 			for (int i = 0; i < groupByFields.length; i++) {
@@ -152,7 +152,7 @@ public class QueryParser {
 		String fields1[] = null;
 		List<String> fields = new ArrayList<String>();
 
-		fields1 = (getBaseQuery(queryString).split("select\\s+"))[1].split("\\s+from");
+		fields1 = getBaseQuery(queryString).split("select\\s+")[1].split("\\s+from");
 		fields1 = fields1[0].trim().split(",");
 
 		for (int i = 0; i < fields1.length; i++) {
@@ -171,7 +171,7 @@ public class QueryParser {
 		String conditionPart = null;
 		String[] temp = null;
 		if (queryString.contains("where")) {
-			temp = (queryString.split("where"))[1].trim().split("(order)|(group)\\s+by");
+			temp = queryString.split("where")[1].trim().split("(order)|(group)\\s+by");
 			conditionPart = temp[0].trim();
 		}
 		return conditionPart;
@@ -187,12 +187,12 @@ public class QueryParser {
 		String[] conditions = null;
 		List<Restriction> restrictList = queryParameter.getRestrictions();
 		if (getConditionsPartQuery(queryString) != null) {
-			String conditionPartQuery = getConditionsPartQuery(queryString).trim();
-			if (conditionPartQuery.toLowerCase().contains(" and ")
-					|| conditionPartQuery.toLowerCase().contains(" or ")) {
-				conditions = conditionPartQuery.trim().split("( and )|( or )");
+			String conditionPart = getConditionsPartQuery(queryString).trim();
+			if (conditionPart.toLowerCase().contains(" and ")
+					|| conditionPart.toLowerCase().contains(" or ")) {
+				conditions = conditionPart.trim().split("( and )|( or )");
 			} else {
-				conditions = new String[] { conditionPartQuery };
+				conditions = new String[] { conditionPart };
 			}
 			restrictList = new ArrayList<Restriction>();
 			for (int i = 0; i < conditions.length; i++) {
@@ -214,11 +214,11 @@ public class QueryParser {
 	public List<String> getLogicalOperators(String queryString) {
 
 		List<String> logicalOperator = null;
-		String conditionsPartQuery = getConditionsPartQuery(queryString);
-		if ((conditionsPartQuery != null)
-				&& (conditionsPartQuery.contains(" and ") | conditionsPartQuery.contains(" or "))) {
+		String conditionsPart = getConditionsPartQuery(queryString);
+		if ((conditionsPart != null)
+				&& conditionsPart.contains(" and ") | conditionsPart.contains(" or ")) {
 			logicalOperator = new ArrayList<String>();
-			String[] splitCondition = getSplitStrings(conditionsPartQuery.trim());
+			String[] splitCondition = getSplitStrings(conditionsPart.trim());
 			for (int i = 0; i < splitCondition.length; i++) {
 				if (splitCondition[i].equals("and") | splitCondition[i].equals("or")) {
 					logicalOperator.add(splitCondition[i]);
@@ -238,13 +238,13 @@ public class QueryParser {
 
 		List<AggregateFunction> aggregateList = queryParameter.getAggregateFunctions();
 		AggregateFunction aggregate = new AggregateFunction();
-		String[] fieldsString = getFields(queryString.toLowerCase());
-		if ((fieldsString.length != 1) && (!(fieldsString[0].equals("*")))) {
+		String[] fieldsString = getFields(queryString);
+		if (fieldsString.length != 1 && (!fieldsString[0].equals("*"))) {
 			aggregateList = new ArrayList<AggregateFunction>();
 			for (int i = 0; i < fieldsString.length; i++) {
 				if (fieldsString[i].contains("(")) {
-					aggregate.setFunction((fieldsString[i].split("\\("))[0].trim());
-					aggregate.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
+					aggregate.setFunction(fieldsString[i].split("\\(")[0].trim());
+					aggregate.setField(fieldsString[i].split("\\(")[1].trim().split("\\)")[0]);
 					aggregateList.add(aggregate);
 				}
 

@@ -57,9 +57,9 @@ public class QueryParameter {
 		return aggregateFunction;
 	}
 
-	public void setAggregateFunctions(List<AggregateFunction> aggregateFunctionList) {
+	public void setAggregateFunctions(List<AggregateFunction> aggregateList) {
 
-		this.aggregateFunction = aggregateFunctionList;
+		this.aggregateFunction = aggregateList;
 
 	}
 
