@@ -88,18 +88,14 @@ public class QueryParser {
 
 	public String getFileName(String queryString) {
 
-		String fileName;
+		String fileName = null;
 		try {
 			String[] fileNameField = (queryString.split("from"))[1].split("(where)|(order)|(group)\\\\s+by");
-
-			if (fileNameField[0].trim().isEmpty()) {
-				fileName = null;
-			} else {
-
+			if (!fileNameField[0].trim().isEmpty()) {
 				fileName = fileNameField[0].trim();
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			fileName = null;
+
 		}
 		return fileName;
 	}
@@ -114,8 +110,9 @@ public class QueryParser {
 		if (queryString.contains(" order by ")) {
 			orderBy = new ArrayList<String>();
 			String[] orderByFields = (queryString.trim().split("\\s+order\\s+by\\s+"))[1].trim().split(",");
-			for (int i = 0; i < orderByFields.length; i++)
+			for (int i = 0; i < orderByFields.length; i++) {
 				orderBy.add(orderByFields[i]);
+			}
 		}
 		return orderBy;
 	}
@@ -137,8 +134,9 @@ public class QueryParser {
 				groupByPart = (groupByPart.split("\\s+order\\s+by\\s+"))[0].trim();
 			}
 			String[] groupByFields = groupByPart.trim().split(",");
-			for (int i = 0; i < groupByFields.length; i++)
+			for (int i = 0; i < groupByFields.length; i++) {
 				groupBy.add(groupByFields[i]);
+			}
 		}
 
 		/* Set the groupBy to QueryParamter variable */
@@ -204,7 +202,6 @@ public class QueryParser {
 				restriction.setPropertyValue(temp[2].trim());
 				restriction.setCondition(temp[1].trim());
 				restrictList.add(restriction);
-
 			}
 		}
 		return restrictList;
@@ -218,18 +215,18 @@ public class QueryParser {
 
 		List<String> logicalOperator = null;
 		String conditionsPartQuery = getConditionsPartQuery(queryString);
-		if (conditionsPartQuery != null) {
-			if (conditionsPartQuery.contains(" and ") | conditionsPartQuery.contains(" or ")) {
-				logicalOperator = new ArrayList<String>();
-				String[] splitCondition = getSplitStrings(conditionsPartQuery.trim());
-				for (int i = 0; i < splitCondition.length; i++)
-					if (splitCondition[i].equals("and") | splitCondition[i].equals("or")) {
-						logicalOperator.add(splitCondition[i]);
-					}
-
+		if ((conditionsPartQuery != null)
+				&& (conditionsPartQuery.contains(" and ") | conditionsPartQuery.contains(" or "))) {
+			logicalOperator = new ArrayList<String>();
+			String[] splitCondition = getSplitStrings(conditionsPartQuery.trim());
+			for (int i = 0; i < splitCondition.length; i++) {
+				if (splitCondition[i].equals("and") | splitCondition[i].equals("or")) {
+					logicalOperator.add(splitCondition[i]);
+				}
 			}
 
 		}
+
 		return logicalOperator;
 
 	}
