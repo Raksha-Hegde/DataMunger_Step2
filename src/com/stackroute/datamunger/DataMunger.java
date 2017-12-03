@@ -10,9 +10,9 @@ public class DataMunger {
 		
 		//read the query from the user
 		System.out.println("Enter a query: ");
-		Scanner sc = new Scanner(System.in);
-		String queryString = sc.nextLine();
-		sc.close();
+		Scanner scannerObj = new Scanner(System.in);
+		String queryString = scannerObj.nextLine();
+		scannerObj.close();
 		
 		
 		//create an object of QueryParser class
@@ -20,6 +20,7 @@ public class DataMunger {
 		
 		//create an object of QueryParameter class
 		QueryParameter queryParameter = new QueryParameter();
+		
 		
 		/*
 		 * call parseQuery() method of the class by passing the query string which will

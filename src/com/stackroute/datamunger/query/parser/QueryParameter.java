@@ -30,8 +30,8 @@ public class QueryParameter {
 		return restriction;
 	}
 
-	public void setRestrictions(Restriction r) {
-		this.restriction.add(r);
+	public void setRestrictions(Restriction restrictionObj) {
+		this.restriction.add(restrictionObj);
 
 	}
 
@@ -57,9 +57,9 @@ public class QueryParameter {
 		return aggregateFunction;
 	}
 
-	public void setAggregateFunctions(AggregateFunction e) {
+	public void setAggregateFunctions(AggregateFunction aggregate) {
 
-		this.aggregateFunction.add(e);
+		this.aggregateFunction.add(aggregate);
 
 	}
 

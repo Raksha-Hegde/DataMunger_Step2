@@ -189,11 +189,11 @@ public class QueryParser {
 
 			for (int i = 0; i < conditions.length; i++) {
 				String[] temp = conditions[i].split("\\s+");
-				Restriction r = new Restriction();
-				r.setPropertyName(temp[0].trim());
-				r.setPropertyValue(temp[2].trim());
-				r.setCondition(temp[1].trim());
-				queryParameter.setRestrictions(r);
+				Restriction restriction = new Restriction();
+				restriction.setPropertyName(temp[0].trim());
+				restriction.setPropertyValue(temp[2].trim());
+				restriction.setCondition(temp[1].trim());
+				queryParameter.setRestrictions(restriction);
 
 			}
 		}
@@ -230,21 +230,21 @@ public class QueryParser {
 	 */
 	public void getAggregateFunctions(String queryString) {
 
-		AggregateFunction e = new AggregateFunction();
+		AggregateFunction aggregate = new AggregateFunction();
 		String[] fieldsString = getFields(queryString.toLowerCase());
 		if ((fieldsString.length == 1) && (fieldsString[0].equals("*"))) {
-			e.setFunction(null);
-			e.setField(null);
+			aggregate.setFunction(null);
+			aggregate.setField(null);
 			queryParameter.setAggregateFunctions(null);
 
 		} else {
 			for (int i = 0; i < fieldsString.length; i++) {
 
 				if (fieldsString[i].contains("(")) {
-					e.setFunction((fieldsString[i].split("\\("))[0].trim());
-					e.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
+					aggregate.setFunction((fieldsString[i].split("\\("))[0].trim());
+					aggregate.setField((fieldsString[i].split("\\("))[1].trim().split("\\)")[0]);
 
-					queryParameter.setAggregateFunctions(e);
+					queryParameter.setAggregateFunctions(aggregate);
 				}
 
 			}
